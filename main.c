@@ -5,11 +5,23 @@
 #include "header.h"
 #include <unistd.h>
 
+
+// Explanation of what this is: This is a super basic program that just asks chatgpt an initial question
+// then has chatgpt respond, then has chatgpt ask itself a question based off of its own response, then answers it
+// ect. Please don't set a gazillion iterations in the loop, it costs me about 5 cents per 100 responses, not a huge amount
+// but if you want to do extensive testing please use your own api key
+
+// Also, most of this was programmed with chatgpt, lol
+
+
 // Buffer to store API response
 #define RESPONSE_BUFFER_SIZE 8192
 
 
 int main() {
+    
+    // random setup stuff
+    
     const char *apiKey = "<>"; // Replace with your OpenAI API key
     char initialQuestion[1024];
     char *responseBuffer = NULL;
@@ -32,19 +44,15 @@ int main() {
 
     // Clear stdin buffer
     getchar();
-
-    // First interaction with ChatGPT
     
     
+   
     
-    
-    
-    
-    
-    
-    char currentQuestion[1024];
+    //Start of the logic
+    char currentQuestion[1024]; // creating a string to hold your initial question and pass it to chatgpt
     strncpy(currentQuestion, initialQuestion, sizeof(currentQuestion));
 
+    // starting a loop of chatgpt answering itself based off of your question
     for (int i = 0; i < iterations; i++) {
         printf("\nIteration %d:\n", i + 1);
         // printf("\n\n\ncurrent question start is : %s\n\n\n\n", currentQuestion); qlongl test
@@ -55,17 +63,20 @@ int main() {
         askChatGPT(apiKey, currentQuestion, &responseBuffer);
 
         if (responseBuffer) {
-            // Extract content from the JSON response
+            // Extract content from the JSON response, (Chatgpt api sends it's responses in these files that are
+            // of json type, so this extract response content function just pulls out the response from the file.
+            // The function is defined in the header file
+            
             extractResponseContent(responseBuffer, content);
 
-            // Print ChatGPT's response
+            // Print ChatGPT's response to itself onto the screen
             printf("ChatGPT's Response:\n%s\n", content);
             
             // sleep to make it more human "thinking" like
             //sleep(7);
-            // Prepare ChatGPT's follow-up question
             
-    
+            
+            // Prepare ChatGPT's follow-up question
             /////////////////////////////////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////////////////////////////////
@@ -74,18 +85,17 @@ int main() {
             // still dont like how it routes through the api, relying on unknown window. Instead would prefer new response to be opened each and every time
             strncpy(currentQuestion, content, sizeof(currentQuestion));
            
+            
+            // this takes chatgpt's previous response, adds the framing "Based on your previous answer : ... pose a follow up\
+            // thus chatgpt is answering it's own responses
             snprintf(currentQuestion, sizeof(currentQuestion),
                      "Based on your previous answer: %s, can you pose and answer a follow-up question about one aspect of this.", content);
             
-           // printf("\n\n\ncurrent question is : %s\n\n\n\n", currentQuestion); qlongl test
-            
-            // it would probably be better to make it ask a question, then feed the question to itself rather than have in same response. That way question is hidden, so it looks like rambling.
             
             /////////////////////////////////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////////////////////////////////
-        // the issue is that it is not asking chatgpt this current question after first attempt. This is likely due to incorrect sending of question to chatgpt.
             
         } else {
             printf("Error: No response received.\n");
@@ -98,5 +108,7 @@ int main() {
 }
 
 
-//devin -> sanfran startup. repeated loops in agi
+
+// devin -> sanfran startup. repeated loops in agi
 // embeding space
+//
